@@ -359,60 +359,7 @@ public class PathOperationComponent extends MarkupComponent<PathOperationCompone
     }
 
     private void exampleMap(MarkupDocBuilder markupDocBuilder, Map<String, Object> exampleMap, String operationSectionTitle, String sectionTitle, boolean beforeBreak, boolean afterBreak) {
-        if (exampleMap.size() > 0) {
-            if (beforeBreak) markupDocBuilder.pageBreak();
-            buildSectionTitle(markupDocBuilder, operationSectionTitle);
-            for (Map.Entry<String, Object> entry : exampleMap.entrySet()) {
 
-                // Example title, like "Response 200" or "Request Body"
-                buildExampleTitle(markupDocBuilder, sectionTitle + " " + entry.getKey());
-
-                if (NumberUtils.isNumber(entry.getKey())) {
-                    // Section header is an HTTP status code (numeric)
-                    JsonNode rootNode = parseExample(entry.getValue());
-                    Iterator<Map.Entry<String, JsonNode>> fieldsIterator = rootNode.fields();
-
-
-
-                    if (!fieldsIterator.hasNext()) {
-                        // rootNode contains a single example, no need to further iterate.
-                        String example = Json.pretty(rootNode);
-//                        String example = Json.pretty(stripExampleQuotes(rootNode.toString()));
-//                        example = Json.pretty(example);
-                        markupDocBuilder.listingBlock(example, "json");
-                    }
-                    while (fieldsIterator.hasNext()) {
-                        Map.Entry<String, JsonNode> field = fieldsIterator.next();
-
-                        if (field.getKey().equals("application/json")) {
-                            String example = Json.pretty(field.getValue());
-                            example = stripExampleQuotes(StringEscapeUtils.unescapeJson(example));
-
-                            markupDocBuilder.listingBlock(example, "json");
-
-                        } else if (field.getKey().equals("application/xml")) {
-
-                            String example = stripExampleQuotes(field.getValue().toString());
-                            example = StringEscapeUtils.unescapeJava(example);
-
-                            //TODO: pretty print XML
-
-                            markupDocBuilder.listingBlock(example, "xml");
-                        } else {
-                            String example = Json.pretty(entry.getValue());
-                            markupDocBuilder.listingBlock(example, "json");
-                            break; // No need to print the same example multiple times
-                        }
-                    }
-                } else if (entry.getKey().equals("path")) {
-                    // Path shouldn't have quotes around it
-                    markupDocBuilder.listingBlock(entry.getValue().toString());
-                } else {
-                    markupDocBuilder.listingBlock(Json.pretty(entry.getValue()), "json");
-                }
-            }
-            if (afterBreak) markupDocBuilder.pageBreak();
-        }
     }
 
     /**
