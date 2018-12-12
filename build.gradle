@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.github.swagger2markup:markup-document-builder:1.1.2'
+//    compile 'io.github.swagger2markup:markup-document-builder:1.1.2'
     compile 'io.swagger:swagger-compat-spec-parser:1.0.35'
     compile 'org.apache.commons:commons-configuration2:2.1'
     compile 'commons-beanutils:commons-beanutils:1.9.2'
@@ -51,6 +51,7 @@ dependencies {
     testCompile 'ch.qos.logback:logback-classic:1.1.2'
     testCompile 'org.assertj:assertj-core:3.8.0'
     testCompile 'io.github.robwin:assertj-diff:0.1.1'
+    compile files('C:\\DATA\\devProjects\\swagger2markdown\\markup-document-builder\\build\\libs\\markup-document-builder-1.1.3-SNAPSHOT.jar')
 }
 
 test {
@@ -65,4 +66,23 @@ test {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.3.1'
+}
+
+//jar {
+//    manifest {
+//        attributes 'Main-Class': 'io.github.swagger2markup.Launcher',
+//                   'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+//    }
+//}
+
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compileClasspath.files.collect {"$it.name"}.join(' '),
+                'Main-Class': 'io.github.swagger2markup.Launcher'
+        )
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
